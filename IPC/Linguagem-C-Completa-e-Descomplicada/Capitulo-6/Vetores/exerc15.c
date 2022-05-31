@@ -6,10 +6,11 @@ int main(){
     scanf("%f", &vetor[i]);
   }
   for(int i = 0; i < 10; i++){
-    if(vetor[i] > vetor[i+1]){
-      auxiliar = vetor[i];
-      vetor[i] = vetor[i+1];
-      vetor[i+1] = auxiliar;
+    for(int j = i+1; j < 10; j++)
+      if(vetor[i] > vetor[j]){
+        auxiliar = vetor[i];
+        vetor[i] = vetor[j];
+        vetor[j] = auxiliar;
     }     
   }
   for(int i = 0; i < 10; i++){
