@@ -8,6 +8,7 @@ int main(){
   for(int i = 0; i < 6; i++){
     printf("%d ", vetor[i]);
   }
+  printf("\n");
 
   return 0;
 }
