@@ -1,5 +1,6 @@
+// Bruno Mundim Franco Rocha Gonçalves
+// Matricula: 12121BSI246
 #include <stdio.h>
-#define TAM 2
 
 int main()
 {
