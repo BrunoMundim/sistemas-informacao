@@ -129,6 +129,56 @@ void novoHorario(Horario *horario)
     horario->min = entradaMin();
 }
 
+Horario calcularTempo(Horario horarioEntrada, Horario horarioSaida)
+{
+    Horario tempoNoEstacionamento;
+
+    tempoNoEstacionamento.ano = horarioSaida.ano - horarioEntrada.ano;
+    tempoNoEstacionamento.mes = horarioSaida.mes - horarioEntrada.mes;    
+
+    if (horarioSaida.dia < horarioEntrada.dia)
+    {
+        if (horarioEntrada.mes == 2 && ((horarioEntrada.ano) % 400 == 0) || (((horarioEntrada.ano) % 4 == 0) && ((horarioEntrada.ano) % 100 != 0)))
+        {
+            tempoNoEstacionamento.dia = 29 - horarioEntrada.dia + horarioSaida.dia;
+        }
+        else if (horarioEntrada.mes == 2)
+        {
+            tempoNoEstacionamento.dia = 28 - horarioEntrada.dia + horarioSaida.dia;
+        }
+        else if (horarioEntrada.mes == 1 || horarioEntrada.mes == 3 || horarioEntrada.mes == 5 || horarioEntrada.mes == 7 || horarioEntrada.mes == 8 || horarioEntrada.mes == 10 || horarioEntrada.mes == 12)
+        {
+            tempoNoEstacionamento.dia = 31 - horarioEntrada.dia + horarioSaida.dia;
+        }
+        else
+        {
+            tempoNoEstacionamento.dia = 30 - horarioEntrada.dia + horarioSaida.dia;
+        }
+    } else {
+        tempoNoEstacionamento.dia = horarioSaida.dia - horarioEntrada.dia;
+    }
+
+    tempoNoEstacionamento.hora = horarioSaida.hora - horarioEntrada.hora;
+    tempoNoEstacionamento.min = horarioSaida.min - horarioEntrada.min;
+    if (tempoNoEstacionamento.min < 0)
+    {
+        tempoNoEstacionamento.min += 60;
+        tempoNoEstacionamento.hora -= 1;
+    }
+    if (tempoNoEstacionamento.hora < 0)
+    {
+        tempoNoEstacionamento.hora += 24;
+        tempoNoEstacionamento.dia -= 1;
+    }
+    if (tempoNoEstacionamento.mes < 0)
+    {
+        tempoNoEstacionamento.mes += 12;
+        tempoNoEstacionamento.ano -= 1;
+    }
+
+    return tempoNoEstacionamento;
+}
+
 void printarRegistro(Registro reg)
 {
     printf("Placa: %s \nModelo: %s \nCor: %s\n", reg.placa, reg.modelo, reg.cor);
@@ -136,6 +186,9 @@ void printarRegistro(Registro reg)
     printf("Horario entrada: \n %d/%d/%d \n %d:%d\n", reg.horaEntrada.dia, reg.horaEntrada.mes, reg.horaEntrada.ano, reg.horaEntrada.hora, reg.horaEntrada.min);
 
     printf("Horario saida: \n %d/%d/%d \n %d:%d\n", reg.horaSaida.dia, reg.horaSaida.mes, reg.horaSaida.ano, reg.horaSaida.hora, reg.horaSaida.min);
+
+    Horario horarioEstacionado = calcularTempo(reg.horaEntrada, reg.horaSaida);
+    printf("Tempo estacionado: \n Anos: %d\n Meses: %d\n Dias: %d\n Horas: %d\n Minutos: %d\n\n", horarioEstacionado.ano, horarioEstacionado.mes, horarioEstacionado.dia, horarioEstacionado.hora, horarioEstacionado.min);
 }
 
 void decidirLocaoInsercao(FILE *f)
@@ -244,34 +297,44 @@ void alterar(FILE *f)
                     printf("5 - Horario saida\n");
                     scanf("%d", &opcao);
 
-                    if (opcao < 1 || opcao > 5) {
+                    if (opcao < 1 || opcao > 5)
+                    {
                         printf("Entrada invalida!");
                     }
-                    else if (opcao == 1) {
+                    else if (opcao == 1)
+                    {
                         printf("Placa: ");
                         scanf("%s", reg.placa);
 
                         fseek(f, -sizeof(Registro), SEEK_CUR);
                         fwrite(&reg, sizeof(Registro), 1, f);
-                    } else if (opcao == 2) {
+                    }
+                    else if (opcao == 2)
+                    {
                         printf("Modelo: ");
                         scanf("%s", reg.modelo);
 
                         fseek(f, -sizeof(Registro), SEEK_CUR);
                         fwrite(&reg, sizeof(Registro), 1, f);
-                    } else if (opcao == 3) {
+                    }
+                    else if (opcao == 3)
+                    {
                         printf("Cor: ");
                         scanf("%s", reg.cor);
 
                         fseek(f, -sizeof(Registro), SEEK_CUR);
                         fwrite(&reg, sizeof(Registro), 1, f);
-                    } else if (opcao == 4) {
+                    }
+                    else if (opcao == 4)
+                    {
                         printf("Horario Entrada: \n");
                         novoHorario(&reg.horaEntrada);
 
                         fseek(f, -sizeof(Registro), SEEK_CUR);
                         fwrite(&reg, sizeof(Registro), 1, f);
-                    } else if (opcao == 5) {
+                    }
+                    else if (opcao == 5)
+                    {
                         printf("Horario Saida: \n");
                         novoHorario(&reg.horaSaida);
 
@@ -281,7 +344,8 @@ void alterar(FILE *f)
 
                     printf("Deseja fazer mais alguma alteracao? (1 - Sim, 2 - Nao): ");
                     scanf("%d", &opcao);
-                    if (opcao == 2) {
+                    if (opcao == 2)
+                    {
                         break;
                     }
                 }
@@ -339,7 +403,7 @@ void buscar(FILE *f)
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (strcmp(reg.placa, placaBuscada) == 0)
+        if (strcmp(reg.placa, placaBuscada) == 0 && reg.status[0] == 'P')
         {
             printarRegistro(reg);
         }
@@ -353,11 +417,9 @@ void listar(FILE *f)
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (reg.status[0] == 'P' || reg.status[0] == 'R')
+        if (reg.status[0] == 'P')
         {
             printarRegistro(reg);
-
-            printf("Status: %c\n\n", reg.status[0]);
         }
     }
 }
