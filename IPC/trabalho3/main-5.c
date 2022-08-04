@@ -11,7 +11,9 @@ int main(){
   // Criando o cubo
   // Altura: 7, Largura: 6, Profundidade: 5
   int altura = 7, largura = 6, profundidade =5;
+
   int ***cubo = (int***) malloc(largura*sizeof(int**));
+
   for(int i = 0; i < largura; i++){
     cubo[i] = (int**) malloc(altura*sizeof(int*));
     for(int j = 0; j < altura; j++){
