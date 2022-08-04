@@ -1,3 +1,6 @@
+// Bruno Mundim Franco Rocha Gonçalves
+// Matrícula: 12121BSI246
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
