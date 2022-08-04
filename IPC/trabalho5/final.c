@@ -14,7 +14,7 @@ typedef struct horario Horario;
 
 struct registro
 {
-    char status[2];
+    char status[1];
     char placa[8];
     char modelo[10];
     char cor[10];
@@ -181,14 +181,18 @@ Horario calcularTempo(Horario horarioEntrada, Horario horarioSaida)
 
 void printarRegistro(Registro reg)
 {
+    printf("\n========== INICIO ===========\n\n");
     printf("Placa: %s \nModelo: %s \nCor: %s\n", reg.placa, reg.modelo, reg.cor);
 
-    printf("Horario entrada: \n %d/%d/%d \n %d:%d\n", reg.horaEntrada.dia, reg.horaEntrada.mes, reg.horaEntrada.ano, reg.horaEntrada.hora, reg.horaEntrada.min);
+    printf("Horario entrada: \n %d/%d/%d - %d:%d\n", reg.horaEntrada.dia, reg.horaEntrada.mes, reg.horaEntrada.ano, reg.horaEntrada.hora, reg.horaEntrada.min);
 
-    printf("Horario saida: \n %d/%d/%d \n %d:%d\n", reg.horaSaida.dia, reg.horaSaida.mes, reg.horaSaida.ano, reg.horaSaida.hora, reg.horaSaida.min);
+    printf("Horario saida: \n %d/%d/%d - %d:%d\n\n", reg.horaSaida.dia, reg.horaSaida.mes, reg.horaSaida.ano, reg.horaSaida.hora, reg.horaSaida.min);
 
     Horario horarioEstacionado = calcularTempo(reg.horaEntrada, reg.horaSaida);
-    printf("Tempo estacionado: \n Anos: %d\n Meses: %d\n Dias: %d\n Horas: %d\n Minutos: %d\n\n", horarioEstacionado.ano, horarioEstacionado.mes, horarioEstacionado.dia, horarioEstacionado.hora, horarioEstacionado.min);
+    printf("Tempo estacionado: \n Anos: %d\n Meses: %d\n Dias: %d\n Horas: %d\n Minutos: %d\n", horarioEstacionado.ano, horarioEstacionado.mes, horarioEstacionado.dia, horarioEstacionado.hora, horarioEstacionado.min);
+
+    printf("Status: %c\n", reg.status[0]);
+    printf("\n========== FIM ===========\n");
 }
 
 void decidirLocaoInsercao(FILE *f)
@@ -202,6 +206,7 @@ void decidirLocaoInsercao(FILE *f)
 
     if (decisao == 2)
     {
+        rewind(f);
         while (fread(&reg, sizeof(reg), 1, f) > 0)
         {
             if (reg.status[0] == 'R')
@@ -417,7 +422,7 @@ void listar(FILE *f)
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (reg.status[0] == 'P')
+        if (reg.status[0] == 'P' || reg.status[0] == 'R')
         {
             printarRegistro(reg);
         }
