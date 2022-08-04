@@ -14,12 +14,12 @@ typedef struct horario Horario;
 
 struct registro
 {
+    char status[2];
     char placa[8];
     char modelo[10];
     char cor[10];
     Horario horaEntrada;
     Horario horaSaida;
-    char status[2];
 };
 typedef struct registro Registro;
 
@@ -129,9 +129,65 @@ void novoHorario(Horario *horario)
     horario->min = entradaMin();
 }
 
+void printarRegistro(Registro reg)
+{
+    printf("Placa: %s \nModelo: %s \nCor: %s\n", reg.placa, reg.modelo, reg.cor);
+
+    printf("Horario entrada: \n %d/%d/%d \n %d:%d\n", reg.horaEntrada.dia, reg.horaEntrada.mes, reg.horaEntrada.ano, reg.horaEntrada.hora, reg.horaEntrada.min);
+
+    printf("Horario saida: \n %d/%d/%d \n %d:%d\n", reg.horaSaida.dia, reg.horaSaida.mes, reg.horaSaida.ano, reg.horaSaida.hora, reg.horaSaida.min);
+}
+
+void decidirLocaoInsercao(FILE *f)
+{
+    Registro reg;
+
+    printf("\nDeseja inserir um novo registro ou sobescrever um antigo?\n");
+    printf("1 - Novo, 2 - Subescrever: ");
+    int decisao, choice, contador = 1;
+    scanf("%d", &decisao);
+
+    if (decisao == 2)
+    {
+        while (fread(&reg, sizeof(reg), 1, f) > 0)
+        {
+            if (reg.status[0] == 'R')
+            {
+                printf("Registro %d: \n", contador);
+
+                printarRegistro(reg);
+
+                printf("Deseja subescrever esse registro? (1 - Sim, 2 - Nao):");
+
+                scanf("%d", &choice);
+
+                if (choice == 1)
+                {
+                    fseek(f, -sizeof(Registro), SEEK_CUR);
+                    break;
+                }
+
+                contador++;
+            }
+        }
+        if (choice != 1)
+        {
+            printf("Nenhum registro escolhido/encontrado. Inserindo entrada no final do arquivo!\n");
+            fseek(f, sizeof(Registro), SEEK_END);
+        }
+    }
+    else
+    {
+        fseek(f, sizeof(Registro), SEEK_END);
+    }
+}
+
 void inserir(FILE *f)
 {
     Registro novoRegistro;
+
+    novoRegistro.status[0] = 'P';
+    novoRegistro.status[1] = '\0';
 
     printf("Placa: ");
     scanf("%s", novoRegistro.placa);
@@ -148,14 +204,92 @@ void inserir(FILE *f)
     printf("Horario saida: \n");
     novoHorario(&novoRegistro.horaSaida);
 
-    novoRegistro.status[0] = 'P';
-
+    decidirLocaoInsercao(f);
     fwrite(&novoRegistro, sizeof(Registro), 1, f);
 }
 
 void alterar(FILE *f)
 {
-    // completar
+    char placaBuscada[8];
+    printf("Placa do registro a ser alterado: ");
+    scanf("%s", placaBuscada);
+    printf("\n");
+
+    Registro reg;
+
+    int cont = 1;
+    rewind(f);
+    while (fread(&reg, sizeof(reg), 1, f) > 0)
+    {
+        if (strcmp(reg.placa, placaBuscada) == 0 && reg.status[0] == 'P')
+        {
+            printf("\nRegistro %d: \n", cont);
+
+            printarRegistro(reg);
+
+            printf("Deseja alterar esse registro? (1 - Sim, 2 - Nao):");
+            int decisao;
+            scanf("%d", &decisao);
+
+            if (decisao == 1)
+            {
+                int opcao;
+                while (1)
+                {
+                    printf("O que deseja alterar: \n");
+                    printf("1 - Placa\n");
+                    printf("2 - Modelo\n");
+                    printf("3 - Cor\n");
+                    printf("4 - Horario entrada\n");
+                    printf("5 - Horario saida\n");
+                    scanf("%d", &opcao);
+
+                    if (opcao < 1 || opcao > 5) {
+                        printf("Entrada invalida!");
+                    }
+                    else if (opcao == 1) {
+                        printf("Placa: ");
+                        scanf("%s", reg.placa);
+
+                        fseek(f, -sizeof(Registro), SEEK_CUR);
+                        fwrite(&reg, sizeof(Registro), 1, f);
+                    } else if (opcao == 2) {
+                        printf("Modelo: ");
+                        scanf("%s", reg.modelo);
+
+                        fseek(f, -sizeof(Registro), SEEK_CUR);
+                        fwrite(&reg, sizeof(Registro), 1, f);
+                    } else if (opcao == 3) {
+                        printf("Cor: ");
+                        scanf("%s", reg.cor);
+
+                        fseek(f, -sizeof(Registro), SEEK_CUR);
+                        fwrite(&reg, sizeof(Registro), 1, f);
+                    } else if (opcao == 4) {
+                        printf("Horario Entrada: \n");
+                        novoHorario(&reg.horaEntrada);
+
+                        fseek(f, -sizeof(Registro), SEEK_CUR);
+                        fwrite(&reg, sizeof(Registro), 1, f);
+                    } else if (opcao == 5) {
+                        printf("Horario Saida: \n");
+                        novoHorario(&reg.horaSaida);
+
+                        fseek(f, -sizeof(Registro), SEEK_CUR);
+                        fwrite(&reg, sizeof(Registro), 1, f);
+                    }
+
+                    printf("Deseja fazer mais alguma alteracao? (1 - Sim, 2 - Nao): ");
+                    scanf("%d", &opcao);
+                    if (opcao == 2) {
+                        break;
+                    }
+                }
+            }
+
+            cont++;
+        }
+    }
 }
 
 void remover(FILE *f)
@@ -166,31 +300,31 @@ void remover(FILE *f)
     printf("\n");
 
     Registro reg;
-    int contador = 1;
-    int size = 1;
-    int *regLocalizados = (int*) malloc(sizeof(int)*size);
-    regLocalizados[0] = 0;
-    
 
+    int cont = 1;
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (strcmp(reg.placa, placaBuscada) == 0 && reg.status[0] != 'R')
+        if (strcmp(reg.placa, placaBuscada) == 0 && reg.status[0] == 'P')
         {
-            size++;
-            regLocalizados = (int*) realloc(regLocalizados, sizeof(int)*size);
-            regLocalizados[size-1] = contador;
-            for(int i = 0; i < size; i++){
-                printf("%d ", regLocalizados[i]);
-            }
-            printf("\n");
-            fseek(f, regLocalizados[size-2]*sizeof(Registro), SEEK_SET);
-            reg.status[0] = 'R';
-            fwrite(&reg, sizeof(Registro), 1, f);
-        }
-        contador++;
-    }
+            printf("Registro %d: \n", cont);
 
+            printarRegistro(reg);
+
+            printf("Deseja apagar registro? (1 - Sim, 2 - Nao):");
+            int decisao;
+            scanf("%d", &decisao);
+
+            if (decisao == 1)
+            {
+                fseek(f, -sizeof(Registro), SEEK_CUR);
+                reg.status[0] = 'R';
+                fwrite(&reg, sizeof(Registro), 1, f);
+            }
+
+            cont++;
+        }
+    }
 }
 
 void buscar(FILE *f)
@@ -207,11 +341,7 @@ void buscar(FILE *f)
     {
         if (strcmp(reg.placa, placaBuscada) == 0)
         {
-            printf("Placa: %s \nModelo: %s \nCor: %s\n\n", reg.placa, reg.modelo, reg.cor);
-
-            printf("Horario entrada: \n %d/%d/%d \n %d:%d\n\n", reg.horaEntrada.dia, reg.horaEntrada.mes, reg.horaEntrada.ano, reg.horaEntrada.hora, reg.horaEntrada.min);
-
-            printf("Horario saida: \n %d/%d/%d \n %d:%d\n\n\n", reg.horaSaida.dia, reg.horaSaida.mes, reg.horaSaida.ano, reg.horaSaida.hora, reg.horaSaida.min);
+            printarRegistro(reg);
         }
     }
 }
@@ -223,13 +353,11 @@ void listar(FILE *f)
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (reg.status[0] == 'P'/*  || reg.status[0] == 'R' */)
+        if (reg.status[0] == 'P' || reg.status[0] == 'R')
         {
-            printf("Placa: %s \nModelo: %s \nCor: %s\n", reg.placa, reg.modelo, reg.cor);
+            printarRegistro(reg);
 
-            printf("Horario entrada: \n %d/%d/%d \n %d:%d\n", reg.horaEntrada.dia, reg.horaEntrada.mes, reg.horaEntrada.ano, reg.horaEntrada.hora, reg.horaEntrada.min);
-
-            printf("Horario saida: \n %d/%d/%d \n %d:%d\n", reg.horaSaida.dia, reg.horaSaida.mes, reg.horaSaida.ano, reg.horaSaida.hora, reg.horaSaida.min);
+            printf("Status: %c\n\n", reg.status[0]);
         }
     }
 }
