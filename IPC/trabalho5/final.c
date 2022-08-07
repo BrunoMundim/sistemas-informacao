@@ -425,7 +425,7 @@ void listar(FILE *f)
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (reg.status[0] == 'P' || reg.status[0] == 'R')
+        if (reg.status[0] == 'P')
         {
             printarRegistro(reg);
         }
