@@ -34,7 +34,7 @@ int entradaAno()
     return ano;
 }
 
-int entradaMes(int bissexto)
+int entradaMes()
 {
     int mes;
     while (1)
@@ -71,9 +71,9 @@ int entradaHora()
     {
         printf("Hora: ");
         scanf("%d", &hora);
-        if (hora < 1 || hora > 24)
+        if (hora < 0 || hora > 23)
         {
-            printf("Entrada invalida: Informe uma hora entre 1 e 24!\n");
+            printf("Entrada invalida: Informe uma hora entre 0 e 23!\n");
         }
         else
             return hora;
@@ -107,7 +107,7 @@ void novoHorario(Horario *horario)
     }
 
     // Mes
-    horario->mes = entradaMes(bissexto);
+    horario->mes = entradaMes();
 
     // Dia
     if (bissexto == 1 && (horario->mes) == 2)
@@ -425,7 +425,7 @@ void listar(FILE *f)
     rewind(f);
     while (fread(&reg, sizeof(reg), 1, f) > 0)
     {
-        if (reg.status[0] == 'P' || reg.status[0] == 'R')
+        if (reg.status[0] == 'P')
         {
             printarRegistro(reg);
         }
