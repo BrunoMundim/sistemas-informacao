@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+  // Lendo o tamanho da primeira matriz
+  int linhas1 = 6;
+  int colunas1 = 6;
+
+  while (linhas1 > 5 || colunas1 > 5)
+  {
+    printf("Quantas linhas tem sua primeira matriz (Maximo: 5)? ");
+    scanf("%d", &linhas1);
+    printf("Quantas colunas tem sua primeira matriz (Maximo: 5)? ");
+    scanf("%d", &colunas1);
+  }
+
+  // Lendo a primeira matriz
+  int **mat1 = (int **)malloc(linhas1 * sizeof(int *));
+
+  for (int i = 0; i < linhas1; i++)
+  {
+    mat1[i] = (int *)malloc(colunas1 * sizeof(int));
+    for (int j = 0; j < colunas1; j++)
+    {
+      printf("Qual o valor da matriz na posicao [%d][%d]: ", (i + 1), (j + 1));
+      scanf("%d", &mat1[i][j]);
+    }
+  }
+
+  // Lendo o tamanho da segunda matriz
+  int linhas2 = 6;
+  int colunas2 = 6;
+
+  while (linhas2 > 5 || colunas2 > 5)
+  {
+    printf("Quantas linhas tem sua segunda matriz (Maximo: 5)? ");
+    scanf("%d", &linhas2);
+    printf("Quantas colunas tem sua segunda matriz (Maximo: 5)? ");
+    scanf("%d", &colunas2);
+  }
+
+  // Lendo a segunda matriz
+  int **mat2 = (int **)malloc(linhas2 * sizeof(int *));
+
+  for (int i = 0; i < linhas2; i++)
+  {
+    mat2[i] = (int *)malloc(colunas2 * sizeof(int));
+    for (int j = 0; j < colunas2; j++)
+    {
+      printf("Qual o valor da matriz na posicao [%d][%d]: ", (i + 1), (j + 1));
+      scanf("%d", &mat2[i][j]);
+    }
+  }
+
+  // Criando matriz resultado
+  int **matRes = (int **)malloc(linhas1 * sizeof(int *));
+
+  for (int i = 0; i < linhas1; i++)
+  {
+    matRes[i] = (int *)malloc(colunas2 * sizeof(int));
+    for (int j = 0; j < colunas2; j++)
+    {
+      matRes[i][j] = 0;
+    }
+  }
+
+  // Calculando matriz resultado
+
+  if (colunas1 == linhas2)
+  {
+    for (int linha = 0; linha < linhas1; linha++)
+    {
+      for (int coluna = 0; coluna < colunas2; coluna++)
+      {
+        int soma = 0;
+        for (int i = 0; i < linhas1; i++)
+        {
+          soma += mat1[linha][i] * mat2[i][coluna];
+          matRes[linha][coluna] = soma;
+        }
+      }
+    }
+  }
+
+  // Imprimindo matriz resultado
+  for (int i = 0; i < linhas1; i++)
+  {
+    for (int j = 0; j < colunas2; j++)
+    {
+      printf("%d ", matRes[i][j]);
+    }
+    printf("\n");
+  }
+}

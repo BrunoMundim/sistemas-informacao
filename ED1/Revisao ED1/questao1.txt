@@ -1,0 +1,165 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#define TAM 10
+
+void lerVetor(int *vet)
+{
+  printf("Digite os %d numeros do vetor:\n", TAM);
+  for (int i = 0; i < TAM; i++)
+  {
+    scanf("%d", &vet[i]);
+  }
+}
+
+void imprimirVetor(int *vet)
+{
+  printf("Seu vetor eh: [");
+  for (int i = 0; i < TAM; i++)
+  {
+    if (i == TAM - 1)
+    {
+      printf("%d]\n", vet[i]);
+    }
+    else
+    {
+      printf("%d, ", vet[i]);
+    }
+  }
+}
+
+int encontrarMaiorValor(int *vet)
+{
+  int maior = vet[0];
+  for (int i = 1; i < TAM; i++)
+  {
+    if (vet[i] > maior)
+      maior = vet[i];
+  }
+  return maior;
+}
+
+struct maiores{
+    int maior;
+    int segundoMaior;
+  };
+  typedef struct maiores Maiores;
+
+Maiores encontrarDoisMaioresValores(int *vet)
+{
+  Maiores valores;
+  valores.maior = INT_MIN;
+  valores.segundoMaior = INT_MIN;
+  for (int i = 0; i < TAM; i++)
+  {
+    if (vet[i] > valores.maior && valores.maior > valores.segundoMaior)
+    {
+      valores.segundoMaior = valores.maior;
+      valores.maior = vet[i];
+    }
+    else if (vet[i] > valores.maior)
+    {
+      valores.maior = vet[i];
+    }
+    else if (vet[i] < valores.maior && vet[i] > valores.segundoMaior)
+    {
+      valores.segundoMaior = vet[i];
+    }
+  }
+  
+  return valores;
+}
+
+float encontrarMedia(int *vet)
+{
+  float soma = 0;
+  for (int i = 0; i < TAM; i++)
+  {
+    soma += vet[i];
+  }
+  float media = soma / TAM;
+ 
+  return media;
+}
+
+void verificarValoresDuplicados(int *vet)
+{
+  int valorAtual;
+  int flag = 0;
+  for (int i = 0; i < TAM; i++)
+  {
+    valorAtual = vet[i];
+    for (int j = i + 1; j < TAM; j++)
+    {
+      if (valorAtual == vet[j])
+      {
+        flag = 1;
+        break;
+      }
+    }
+    if (flag == 1)
+      break;
+  }
+  if (flag == 1)
+  {
+    printf("Existem valores iguais no vetor!\n");
+  }
+  else
+  {
+    printf("Nao existem valores iguais no vetor!\n");
+  }
+}
+
+void imprimirVetorInvertido(int *vet)
+{
+  printf("Imprimindo o vetor invertido: [");
+  for (int i = TAM - 1; i >= 0; i--)
+  {
+    if (i == 0)
+    {
+      printf("%d]\n", vet[i]);
+    }
+    else
+    {
+      printf("%d, ", vet[i]);
+    }
+  }
+}
+
+void contarImpares(int *vet)
+{
+  int cont = 0;
+  for (int i = 0; i < TAM; i++)
+  {
+    if (vet[i] % 2 != 0)
+      cont++;
+  }
+  printf("O vetor possui %d numero(s) impar(es)!\n", cont);
+}
+
+int main()
+{
+  int *vet;
+  vet = malloc(TAM * sizeof(int));
+
+  lerVetor(vet);
+
+  imprimirVetor(vet);
+ 
+  printf("O maior valor eh: %d\n", encontrarMaiorValor(vet));
+
+  printf("O maior valor eh: %d\n", encontrarDoisMaioresValores(vet).maior);
+  printf("O segundo maior valor eh: %d\n", encontrarDoisMaioresValores(vet).segundoMaior);
+
+  printf("A media dos valores eh: %.2f\n", encontrarMedia(vet));
+
+  verificarValoresDuplicados(vet);
+
+  imprimirVetorInvertido(vet);
+
+  contarImpares(vet);
+
+  free(vet);
+
+  return 0;
+}

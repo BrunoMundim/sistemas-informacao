@@ -1,0 +1,14 @@
+(a) a = 10; : Atribui o valor de 10 a variavel "a"
+(b) b = &a; : Atribui ao valor da variavel b o endereço de a
+(c) P1 = a; : Atribui ao ponteiro p1 o valor de a, não funciona corretamente, pois o valor informado deveria ser o endereço de a
+(d) a = &P1; : Atribui a "a" o endereço de P1
+(e) *P1 = &a; : Atribui ao valor de P1 o endereço de "a", não funciona corretamente
+(f) &P1 = &a; : Atribui ao endereço do ponteiro P1 o endereço de "a", não funciona corretamente
+(g) P4 = &a; : Atribui o endereço de "a" ao ponteiro P4, funciona corretamente e agora P4 aponta para a
+(h) P4 = P1; : Atribui a P1 o que P4 aponta, nessa sequência "a"
+(i) P2 = P1 = &a; Atribui a P2 e P1 o endereço de "a", fazendo com que eles apontem para "a"
+(j) *P1 = 20; Atribui o valor de 20 a variavel que o ponteiro aponta, nessa sequência "a"
+(k) *P2 = *P1; Atribui o valor de 20 a variavel apontada por P2
+(l) *P3 = &P1; Atribui o endereço do ponteiro P1 para o valor de P3
+(m) P3 = &P2;  Atribui o endereço de P2 ao ponteiro P3
+(n) **P3 = *P1; Atribui o valor de P1 ao ponteiro P3
