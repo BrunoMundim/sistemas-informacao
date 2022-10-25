@@ -1,0 +1,16 @@
+Exercício 1 -
+  A pilha é um tipo de lista que funciona similarmente a uma pilha de pratos, o último item a ser adicionado é o primeiro a sair. 
+  
+  Pilhas são úteis para lidar com estruturas aninhadas, por exemplo expressões algébricas.
+
+Exercício 2 -
+  Desempilha D
+  Desempilha C
+  Desempilha B
+  Empilha C
+  Empilha D
+  Empilha B  
+
+Exercício 3 -
+  Pilha = [10, 30]
+
